@@ -20,21 +20,24 @@ import com.group.libraryapp.domain.User;
 import com.group.libraryapp.dto.user.request.UserCreateRequest;
 import com.group.libraryapp.dto.user.request.UserUpdateRequest;
 import com.group.libraryapp.dto.user.response.UserResponse;
+import com.group.libraryapp.service.user.UserService;
 
 @RestController
 public class UserController {
+
+	private final UserService userService;
 
 	// private final List<User> users = new ArrayList<>();
 	private final JdbcTemplate jdbcTemplate;
 
 	public UserController(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
+		this.userService = new UserService(jdbcTemplate);
 	}
 
 	@PostMapping("/user")
 	public void saveUser(@RequestBody UserCreateRequest request) {
-		String sql = "INSERT INTO user(name, age) VALUES(?, ?)";
-		jdbcTemplate.update(sql, request.getName(), request.getAge());
+		userService.saveUser(request);
 	}
 
 	// UserController.java 안에 들어간다.
@@ -46,34 +49,17 @@ public class UserController {
 //			responses.add(new UserResponse(i + 1, users.get(i)));
 //		}
 //		return responses;
-		String sql = "SELECT * FROM user";
-		return jdbcTemplate.query(sql, new RowMapper<UserResponse>() {
-			@Override
-			public UserResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
-				long id = rs.getLong("id");
-				String name = rs.getString("name");
-				int age = rs.getInt("age");
-				return new UserResponse(id, name, age);
-			}
-		});
+		return userService.getUsers();
 	}
 
 	@PutMapping("/user")
 	public void updateUser(@RequestBody UserUpdateRequest request) {
-		String readSql = "SELECT * FROM user WHERE id = ?";
-		boolean isUserNotExist = jdbcTemplate.query(readSql, (rs, Rownum) -> 0, request.getId()).isEmpty();
-		if (isUserNotExist) {
-			throw new IllegalArgumentException();
-		}
-		String sql = "UPDATE user SET name = ? where id = ? ";
-		jdbcTemplate.update(sql, request.getName(), request.getId());
+		userService.updateUser(request);
 	}
 
 	@DeleteMapping("/user")
 	public void deleteUser(@RequestParam String name) {
-
-		String sql = "DELETE FROM user WHERE name = ?";
-		jdbcTemplate.update(sql, name);
+		userService.deleteUser(name);
 	}
 
 	@GetMapping("/user/error-test")
