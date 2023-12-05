@@ -2,6 +2,7 @@ package com.group.libraryapp.service.user;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -11,11 +12,11 @@ import com.group.libraryapp.dto.user.response.UserResponse;
 import com.group.libraryapp.repository.user.UserRepository;
 
 @Service
-public class UserService {
+public class UserServiceV1 {
 
 	private final UserRepository userRepository;
 
-	public UserService(UserRepository userRepository) {
+	public UserServiceV1(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
 
