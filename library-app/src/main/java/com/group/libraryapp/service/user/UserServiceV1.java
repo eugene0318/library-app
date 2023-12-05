@@ -1,49 +1,44 @@
 package com.group.libraryapp.service.user;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
-
 import com.group.libraryapp.dto.user.request.UserCreateRequest;
 import com.group.libraryapp.dto.user.request.UserUpdateRequest;
 import com.group.libraryapp.dto.user.response.UserResponse;
-import com.group.libraryapp.repository.user.UserRepository;
+import com.group.libraryapp.repository.user.UserJdbcRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserServiceV1 {
 
-	private final UserRepository userRepository;
+	private final UserJdbcRepository userJdbcRepository;
 
-	public UserServiceV1(UserRepository userRepository) {
-		this.userRepository = userRepository;
-	}
-
-	public void updateUser(UserUpdateRequest request) {
-		boolean isUserNotExist = userRepository.isUserNotExist(request.getId());
-
-		if (isUserNotExist) {
-			throw new IllegalArgumentException();
-		}
-		userRepository.updateUserName(request.getName(), request.getId());
-	}
-
-	public void deleteUser(String name) {
-		String sql = "DELETE FROM user WHERE name = ?";
-		if (userRepository.isUserNotExist(name)) {
-			throw new IllegalArgumentException();
-		}
-
-		userRepository.deleteUser(name);
+	public UserServiceV1(UserJdbcRepository userJdbcRepository) {
+		this.userJdbcRepository = userJdbcRepository;
 	}
 
 	public void saveUser(UserCreateRequest request) {
-		userRepository.saveUser(request.getName(), request.getAge());
-		;
+		userJdbcRepository.saveUser(request.getName(), request.getAge());
 	}
 
 	public List<UserResponse> getUsers() {
-		return userRepository.getUsers();
+		return userJdbcRepository.getUsers();
 	}
+
+	public void updateUser(UserUpdateRequest request) {
+		if (userJdbcRepository.isUserNotExist(request.getId())) {
+			throw new IllegalArgumentException();
+		}
+
+		userJdbcRepository.updateUserName(request.getName(), request.getId());
+	}
+
+	public void deleteUser(String name) {
+		if (userJdbcRepository.isUserNotExist(name)) {
+			throw new IllegalArgumentException();
+		}
+
+		userJdbcRepository.deleteUser(name);
+	}
+
 }
