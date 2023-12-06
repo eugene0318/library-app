@@ -2,9 +2,11 @@ package com.group.libraryapp.service.book;
 
 import org.springframework.stereotype.Service;
 
-import com.group.libraryapp.repository.book.BookMemoryRepository;
-import com.group.libraryapp.repository.book.BookMySqlRepository;
-import com.group.libraryapp.repository.book.BookRepository;
+import com.group.libraryapp.domain.book.Book;
+import com.group.libraryapp.domain.book.BookRepository;
+import com.group.libraryapp.dto.book.request.BookCreateRequest;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class BookService {
@@ -12,13 +14,13 @@ public class BookService {
 	private final BookRepository bookRepository;
 
 	public BookService(BookRepository bookRepository) {
-		super();
 		this.bookRepository = bookRepository;
 	}
 
-	public void saveBook() {
+	@Transactional
+	public void saveBook(BookCreateRequest request) {
 		// TODO Auto-generated method stub
-		bookRepository.saveBook();
+		bookRepository.save(new Book(request.getName()));
 
 	}
 
