@@ -5,8 +5,10 @@ import java.util.List;
 
 import com.group.libraryapp.domain.user.loanhistory.UserLoanHistory;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,8 +23,8 @@ public class User {
 	@Column(nullable = false, length = 20, name = "name")
 	private String name;
 	private Integer age;
-	
-	@OneToMany(mappedBy = "user")
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<UserLoanHistory> userLoanHistories = new ArrayList<>();
 
 	// JPA는 기본 생성자가 꼭 필요
@@ -52,6 +54,17 @@ public class User {
 
 	public void updateName(String name) {
 		this.name = name;
+	}
+
+	public void loanBook(String bookName) {
+		this.userLoanHistories.add(new UserLoanHistory(this, bookName));
+	}
+
+	public void returnBook(String bookName) {
+		UserLoanHistory targetHistory = this.userLoanHistories.stream()
+				.filter(history -> history.getBookName().equals(bookName)).findFirst()
+				.orElseThrow(IllegalArgumentException::new);
+		targetHistory.doReturn();
 	}
 
 }
